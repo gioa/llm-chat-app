@@ -37,7 +37,7 @@ describe('sendMessage', () => {
     // Verify assistant message
     expect(result.assistant_message.conversation_id).toEqual(conversationId);
     expect(result.assistant_message.role).toEqual('assistant');
-    expect(result.assistant_message.content).toContain('placeholder LLM response');
+    expect(result.assistant_message.content).toContain('Hello there! This is a mock response');
     expect(result.assistant_message.id).toBeDefined();
     expect(result.assistant_message.created_at).toBeInstanceOf(Date);
 
@@ -78,7 +78,7 @@ describe('sendMessage', () => {
     // Verify assistant message
     expect(messages[1].id).toEqual(result.assistant_message.id);
     expect(messages[1].role).toEqual('assistant');
-    expect(messages[1].content).toContain('placeholder LLM response');
+    expect(messages[1].content).toContain('mock LLM response');
   });
 
   it('should update conversation updated_at timestamp', async () => {
@@ -136,7 +136,7 @@ describe('sendMessage', () => {
 
     // Verify the assistant response mentions the context count
     // (should be 3 messages: 2 existing + 1 new user message)
-    expect(result.assistant_message.content).toContain('3 messages');
+    expect(result.assistant_message.content).toContain('3 previous messages');
   });
 
   it('should throw error for non-existent conversation', async () => {
