@@ -1,13 +1,28 @@
 
+import { db } from '../db';
+import { conversationsTable } from '../db/schema';
 import { type UpdateConversationInput, type Conversation } from '../schema';
+import { eq } from 'drizzle-orm';
 
 export const updateConversation = async (input: UpdateConversationInput): Promise<Conversation> => {
-    // This is a placeholder declaration! Real code should be implemented here.
-    // The goal of this handler is updating the conversation name and updated_at timestamp in the database.
-    return Promise.resolve({
-        id: input.id,
+  try {
+    // Update conversation record
+    const result = await db.update(conversationsTable)
+      .set({
         name: input.name,
-        created_at: new Date(), // Placeholder - should be original creation date
         updated_at: new Date()
-    } as Conversation);
+      })
+      .where(eq(conversationsTable.id, input.id))
+      .returning()
+      .execute();
+
+    if (result.length === 0) {
+      throw new Error(`Conversation with id ${input.id} not found`);
+    }
+
+    return result[0];
+  } catch (error) {
+    console.error('Conversation update failed:', error);
+    throw error;
+  }
 };

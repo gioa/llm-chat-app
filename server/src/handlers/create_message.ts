@@ -1,15 +1,32 @@
 
+import { db } from '../db';
+import { messagesTable, conversationsTable } from '../db/schema';
 import { type CreateMessageInput, type Message } from '../schema';
+import { eq } from 'drizzle-orm';
 
 export const createMessage = async (input: CreateMessageInput): Promise<Message> => {
-    // This is a placeholder declaration! Real code should be implemented here.
-    // The goal of this handler is creating a new message and persisting it in the database.
-    // This handler also updates the conversation's updated_at timestamp.
-    return Promise.resolve({
-        id: 0, // Placeholder ID
+  try {
+    // Create the message
+    const result = await db.insert(messagesTable)
+      .values({
         conversation_id: input.conversation_id,
         role: input.role,
-        content: input.content,
-        created_at: new Date()
-    } as Message);
+        content: input.content
+      })
+      .returning()
+      .execute();
+
+    const message = result[0];
+
+    // Update the conversation's updated_at timestamp
+    await db.update(conversationsTable)
+      .set({ updated_at: new Date() })
+      .where(eq(conversationsTable.id, input.conversation_id))
+      .execute();
+
+    return message;
+  } catch (error) {
+    console.error('Message creation failed:', error);
+    throw error;
+  }
 };

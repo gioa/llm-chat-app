@@ -1,9 +1,19 @@
 
+import { db } from '../db';
+import { conversationsTable } from '../db/schema';
 import { type DeleteConversationInput } from '../schema';
+import { eq } from 'drizzle-orm';
 
 export const deleteConversation = async (input: DeleteConversationInput): Promise<{ success: boolean }> => {
-    // This is a placeholder declaration! Real code should be implemented here.
-    // The goal of this handler is deleting a conversation and all its associated messages from the database.
-    // Messages will be automatically deleted due to cascade delete constraint.
-    return Promise.resolve({ success: true });
+  try {
+    // Delete conversation - messages will be automatically deleted due to cascade delete constraint
+    const result = await db.delete(conversationsTable)
+      .where(eq(conversationsTable.id, input.id))
+      .execute();
+
+    return { success: true };
+  } catch (error) {
+    console.error('Conversation deletion failed:', error);
+    throw error;
+  }
 };

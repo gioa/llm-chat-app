@@ -1,13 +1,23 @@
 
+import { db } from '../db';
+import { conversationsTable } from '../db/schema';
 import { type CreateConversationInput, type Conversation } from '../schema';
 
 export const createConversation = async (input: CreateConversationInput): Promise<Conversation> => {
-    // This is a placeholder declaration! Real code should be implemented here.
-    // The goal of this handler is creating a new conversation and persisting it in the database.
-    return Promise.resolve({
-        id: 0, // Placeholder ID
-        name: input.name,
-        created_at: new Date(),
-        updated_at: new Date()
-    } as Conversation);
+  try {
+    // Insert conversation record
+    const result = await db.insert(conversationsTable)
+      .values({
+        name: input.name
+      })
+      .returning()
+      .execute();
+
+    // Return the created conversation
+    const conversation = result[0];
+    return conversation;
+  } catch (error) {
+    console.error('Conversation creation failed:', error);
+    throw error;
+  }
 };
